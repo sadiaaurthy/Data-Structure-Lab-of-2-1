@@ -2,53 +2,52 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-void min_heapify(vector<int> &v, int par) {
+void max_heapify(vector<int> &v, int par) {
     int lc = 2 * par + 1;
     int rc = 2 * par + 2;
-    int smallest = par;
+    int largest = par;
 
-    if (lc < v.size() && v[lc] < v[smallest]) {
-        smallest = lc;
+    if (lc < v.size() && v[lc] > v[largest]) {
+        largest = lc;
     }
-    if (rc < v.size() && v[rc] < v[smallest]) {
-        smallest = rc;
+    if (rc < v.size() && v[rc] > v[largest]) {
+        largest = rc;
     }
-    if (smallest != par) {
-        swap(v[smallest], v[par]);
-        min_heapify(v, smallest);
+    if (largest != par) {
+        swap(v[largest], v[par]);
+        max_heapify(v, largest);
     }
 }
 
-void build_min_heap(vector<int> &v) {
+void build_max_heap(vector<int> &v) {
     for (int i = (v.size() - 1) / 2; i >= 0; i--) { 
-        min_heapify(v, i);
+        max_heapify(v, i);
     }
 }
 
-int Heap_min(const vector<int> &v) {
+int Heap_max(const vector<int> &v) {
     return v[0];
 }
 
-int Heap_extract_min(vector<int> &v) {
-    // build_min_heap(v) ;
+int Heap_extract_max(vector<int> &v) {
     if (v.size() < 1) {
         cout << "Underflow" << endl;
         return -1;
     }
-    int Min = v[0];
+    int Max = v[0];
     v[0] = v[v.size() - 1];
     v.pop_back();
-    min_heapify(v, 0);
-    return Min;
+    max_heapify(v, 0);
+    return Max;
     
 }
 
-void min_heap_insert(vector<int> &v, int k) {
+void max_heap_insert(vector<int> &v, int k) {
     v.push_back(k);
     int child = v.size() - 1;
     int par = (child - 1) / 2;
 
-    while (child > 0 && v[par] > v[child]) {
+    while (child > 0 && v[par] < v[child]) {
         swap(v[child], v[par]);
         child = par;
         par = (child - 1) / 2;
@@ -57,14 +56,14 @@ void min_heap_insert(vector<int> &v, int k) {
 
 void Heap_increase_key(vector<int> &v, int k, int idx) {
     v[idx] += k;
-    min_heapify(v, idx);
+    max_heapify(v, idx);
 }
 
 void Heap_decrease_key(vector<int> &v, int k, int idx) {
     v[idx] -= k;
     int child = idx;
     int par = (child - 1) / 2;
-    while (child > 0 && v[par] > v[child]) {
+    while (child > 0 && v[par] < v[child]) {
         swap(v[par], v[child]);
         child = par;
         par = (child - 1) / 2;
@@ -88,8 +87,8 @@ int main() {
         v.push_back(num);
     }
 
-    build_min_heap(v);
-    cout << "Min heap: ";
+    build_max_heap(v);
+    cout << "Max heap: ";
     Print(v);
 
     while (true) {
@@ -99,19 +98,19 @@ int main() {
 
         switch(func_id) {
             case 1: {  
-                cout << "Min: " << Heap_min(v) << endl;
+                cout << Heap_max(v) << endl;
                 Print(v);
                 break;
             }
             case 2: { 
                 int heapSize = v.size();
-                cout << "Extracted min: " << Heap_extract_min(v) << endl;
+                cout << "Extracted max: " << Heap_extract_max(v) << endl;
                 Print(v);
                 break;
             }
             case 3: { 
                 cin >> key;
-                min_heap_insert(v, key);
+                max_heap_insert(v, key);
                 Print(v);
                 break;
             }
@@ -129,6 +128,5 @@ int main() {
             }
         }
     }
-
     return 0;
-}///The most optimal approach using build_min_heap() only once ,pdf e etai krte bolsilo
+}
