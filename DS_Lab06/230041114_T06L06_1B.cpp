@@ -7,122 +7,125 @@ struct Node {
     int data;
     Node* left;
     Node* right;
-    
-    Node(int val) {
-        data = val;
-        left = nullptr;
-        right = nullptr;
-    }
 };
+Node* CreateNode(int val) {
+    Node* newNode = new Node;
+    newNode->data = val;
+    newNode->left = nullptr;
+    newNode->right = nullptr;
+    return newNode;
+}
 class BST {
 private:
     Node* root;
-    Node* insert(Node* node, int val) {
+    Node* insert(Node* node, int elm) {
         if (node == nullptr) {
-            return new Node(val);
+            return CreateNode(elm);
         }
-        
-        if (val < node->data) {
-            node->left = insert(node->left, val);
-        } else if (val > node->data) {
-            node->right = insert(node->right, val);
+        if (elm < node->data) {
+            node->left = insert(node->left, elm);
+        } else if (elm > node->data) {
+            node->right = insert(node->right, elm);
         }
-        
         return node;
+    }  
+    void inorder(Node* node) {
+        if (node == nullptr) return;
+        inorder(node->left);
+        cout << node->data << " ";
+        inorder(node->right);
     }
-    bool findAncestors(Node* node, int target, vector<int>& ancestors) {
-        if (node == nullptr) {
-            return false;
-        }
-
-        if (node->data == target) {
-            return true;
-        }
-        if (findAncestors(node->left, target, ancestors) || 
-            findAncestors(node->right, target, ancestors)) {
-            ancestors.push_back(node->data);
-            return true;
-        }
+    bool AncsFinder(Node* node, int tar, vector<int>& a) {
+        if (node == nullptr) return false;
         
+        if (node->data == tar) return true;
+        
+        if (AncsFinder(node->left, tar, a) ||
+            AncsFinder(node->right, tar, a)) {
+            a.push_back(node->data);
+            return true;
+        }
         return false;
     }
-
-    Node* findNode(Node* node, int target) {
-        if (node == nullptr || node->data == target) {
-            return node;
-        }
+    
+    Node* NodeFinder(Node* node, int tar) {
+        if (node == nullptr || node->data == tar) return node;
         
-        if (target < node->data) {
-            return findNode(node->left, target);
-        } else {
-            return findNode(node->right, target);
-        }
+        if (tar < node->data)
+            return NodeFinder(node->left, tar);
+        else
+            return NodeFinder(node->right, tar);
     }
-
-    void getDescendants(Node* node, vector<int>& descendants) {
-        if (node == nullptr) {
-            return;
-        }
-        getDescendants(node->left, descendants);
-        descendants.push_back(node->data);
-        getDescendants(node->right, descendants);
+    
+    void getDesc(Node* node, vector<int>& d) {
+        if (node == nullptr) return;
+        
+        getDesc(node->left, d);
+        d.push_back(node->data);
+        getDesc(node->right, d);
     }
+    
 public:
     BST() {
         root = nullptr;
     }
-    void insert(int val) {
-        root = insert(root, val);
+    void insert(int elm) {
+        root = insert(root, elm);
     }
-    vector<int> getAncestors(int target) {
-        vector<int> ancestors;
-        findAncestors(root, target, ancestors);
-        sort(ancestors.begin(), ancestors.end());
-        return ancestors;
+    void StatusPrinter() {
+        cout << "Status: ";
+        inorder(root);
+        cout << endl;
     }
-    vector<int> getDescendantsOf(int target) {
-        Node* targetNode = findNode(root, target);
-        vector<int> descendants;
-        if (targetNode != nullptr) {
-            getDescendants(targetNode->left, descendants);
-            getDescendants(targetNode->right, descendants);
+    vector<int> getAnc(int tar) {
+        vector<int> a;
+        AncsFinder(root, tar, a);
+        sort(a.begin(), a.end());
+        return a;
+    }
+    
+    vector<int> getDescOf(int tar) {
+        vector<int> d;
+        Node* tarNode = NodeFinder(root, tar);
+        
+        if (tarNode != nullptr) {
+            getDesc(tarNode->left, d);
+            getDesc(tarNode->right, d);
         }
-        return descendants;
+        return d;
     }
 };
 
 int main() {
     BST bst;
-    int val;
-    while (cin >> val && val != -1) {
-        bst.insert(val);
+    int elm;
+    while (true) {
+        cin >> elm;
+        if (elm == -1) break;
+        bst.insert(elm);
     }
-
-    int query;
-    while (cin >> query) {
-        vector<int> ancestors = bst.getAncestors(query);
-        vector<int> descendants = bst.getDescendantsOf(query);
-
-        if (ancestors.empty()) {
-            cout << "Null" << endl;
-        } else {
-            for (int i = 0; i < ancestors.size(); i++) {
-                if (i > 0) cout << " ";
-                cout << ancestors[i];
+    bst.StatusPrinter();
+    int n;
+    while (true) {
+        cin >> n;
+        vector<int> a = bst.getAnc(n);
+        vector<int> d = bst.getDescOf(n);
+        if (a.empty()) cout << "Null" << endl;
+        else {
+            for (int i = 0; i < a.size(); i++) {
+                if (i) cout << " ";
+                cout << a[i];
             }
             cout << endl;
         }
-
-        if (descendants.empty()) {
-            cout << "Null" << endl;
-        } else {
-            for (int i = 0; i < descendants.size(); i++) {
-                if (i > 0) cout << " ";
-                cout << descendants[i];
+        if (d.empty()) cout << "Null" << endl;
+        else {
+            for (int i = 0; i < d.size(); i++) {
+                if (i) cout << " ";
+                cout << d[i];
             }
             cout << endl;
         }
     }
-    
     return 0;
 }
