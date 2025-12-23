@@ -4,63 +4,66 @@ struct Node {
     int data;
     Node* left;
     Node* right;
-    Node(int val) : data(val), left(nullptr), right(nullptr) {}
 };
+Node* CreateNode(int elm) {
+    Node* temp = new Node;
+    temp->data = elm;
+    temp->left = nullptr;
+    temp->right = nullptr;
+    return temp;
+}
 class BST {
 private:
     Node* root;
-    Node* insert(Node* node, int val) {
+    Node* insert(Node* node, int elm) {
         if (node == nullptr) {
-            return new Node(val);
+            return CreateNode(elm);
         }
         
-        if (val < node->data) {
-            node->left = insert(node->left, val);
-        } else if (val > node->data) {
-            node->right = insert(node->right, val);
+        if (elm < node->data) {
+            node->left = insert(node->left, elm);
+        } else if (elm > node->data) {
+            node->right = insert(node->right, elm);
         }
-        
         return node;
     }
-    int findLCA(Node* node, int u, int v) {
+    int LCA_finder(Node* node, int u, int v) {
         if (node == nullptr) return -1;
 
-        if (u < node->data && v < node->data) {
-            return findLCA(node->left, u, v);
-        }
+        if (u < node->data && v < node->data)
+            return LCA_finder(node->left, u, v);
 
-        if (u > node->data && v > node->data) {
-            return findLCA(node->right, u, v);
-        }
-
-        return node->data;
+        if (u > node->data && v > node->data)
+            return LCA_finder(node->right, u, v);
+        return node->data;  
     }
 public:
-    BST() : root(nullptr) {}
-    
-    void insert(int val) {
-        root = insert(root, val);
+    BST() {
+        root = nullptr;
     }
-    
-    int getLCA(int u, int v) {
-        return findLCA(root, u, v);
+    void insert(int elm) {
+        root = insert(root, elm);
+    }
+    int LCA(int u, int v) {
+        return LCA_finder(root, u, v);
     }
 };
+
 int main() {
     int n;
     cin >> n;
     BST tree;
     for (int i = 0; i < n; i++) {
-        int val;
-        cin >> val;
-        tree.insert(val);
+        int elm;
+        cin >> elm;
+        tree.insert(elm);
     }
     int q;
     cin >> q;
     for (int i = 0; i < q; i++) {
         int u, v;
         cin >> u >> v;
-        cout << tree.getLCA(u, v) << endl;
+        cout << tree.LCA(u, v) << endl;
     }
     return 0;
 }
