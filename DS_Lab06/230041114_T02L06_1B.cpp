@@ -160,10 +160,8 @@ Node* After(Node* n) {
         n = parent;
         parent = parent->par;
     }
-    return parent;
-    
+    return parent;   
 }
-
 void before_after(int value) {
     Node* found = searchNode(value);
     if (found == nullptr) {
