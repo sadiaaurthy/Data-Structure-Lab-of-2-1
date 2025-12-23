@@ -92,9 +92,9 @@ public:
         cout << endl;
     }
     void Print(int x, int y) {
-        vector<int> pathX, pathY;
-        PathFinder(root, x, pathX);
-        PathFinder(root, y, pathY);
+        vector<int> pX, pY;
+        PathFinder(root, x, pX);
+        PathFinder(root, y, pY);
         Node* lca = LCA_finder(root, x, y);
         vector<int> ComPath;
         vector<int> XtoLCA;
