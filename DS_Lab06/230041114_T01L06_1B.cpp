@@ -8,9 +8,7 @@ struct Node{
     Node* par;
     int height;
 };
-
 Node* root = nullptr;
-
 Node* CreateNode(int x){
     Node* newNode = new Node();
     newNode->data = x;
@@ -144,4 +142,5 @@ int main(){
             case 5: return 0;
         }
     }
+
 }
