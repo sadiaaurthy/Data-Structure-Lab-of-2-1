@@ -7,136 +7,140 @@ struct Node {
     int height;
     Node* left;
     Node* right;
-    Node(int val) {
-        data = val;
-        height = 0;
-        left = nullptr;
-        right = nullptr;
-    }
 };
+Node* createNode(int elm) {
+    Node* newNode = new Node();
+    newNode->data = elm;
+    newNode->height = 0;
+    newNode->left = nullptr;
+    newNode->right = nullptr;
+    return newNode;
+}
 class BST {
 private:
     Node* root;
     int getHeight(Node* node) {
-        return (node == nullptr) ? -1 : node->height;
+        if (node == nullptr) return -1 ;
+        else return node->height;
     }
     void updateHeight(Node* node) {
         if (node != nullptr) {
             node->height = max(getHeight(node->left), getHeight(node->right)) + 1;
         }
     }
-    Node* insert(Node* node, int val) {
+    Node* insert(Node* node, int elm) {
         if (node == nullptr) {
-            return new Node(val);
+            return createNode(elm);
         }
-        if (val < node->data) {
-            node->left = insert(node->left, val);
-        } else if (val > node->data) {
-            node->right = insert(node->right, val);
+        if (elm < node->data) {
+            node->left = insert(node->left, elm);
+        } else if (elm > node->data) {
+            node->right = insert(node->right, elm);
         }
         updateHeight(node);
-        
         return node;
     }
-    void inorderWithHeight(Node* node) {
-        if (node == nullptr) return;
-        
-        inorderWithHeight(node->left);
+    void inorder(Node* node) {
+        if (node == nullptr) return; 
+        inorder(node->left);
         cout << node->data << "(" << node->height << ") ";
-        inorderWithHeight(node->right);
+        inorder(node->right);
     }
-    bool findPath(Node* node, int target, vector<int>& path) {
+    bool PathFinder(Node* node, int tar, vector<int>& v) {
         if (node == nullptr) {
             return false;
         }
-
-        path.push_back(node->data);
-        if (node->data == target) {
+        v.push_back(node->data);
+        if (node->data == tar) {
             return true;
         }
-        if (target < node->data) {
-            if (findPath(node->left, target, path)) {
+        if (tar < node->data) {
+            if (PathFinder(node->left, tar, v)) {
                 return true;
             }
         } else {
-            if (findPath(node->right, target, path)) {
+            if (PathFinder(node->right, tar, v)) {
                 return true;
             }
         }
-
-        path.pop_back();
+        v.pop_back();
         return false;
     }
-    Node* findLCA(Node* node, int x, int y) {
+    Node* LCA_finder(Node* node, int x, int y) {
         if (node == nullptr) {
             return nullptr;
         }
         if (x < node->data && y < node->data) {
-            return findLCA(node->left, x, y);
+            return LCA_finder(node->left, x, y);
         }
         if (x > node->data && y > node->data) {
-            return findLCA(node->right, x, y);
+            return LCA_finder(node->right, x, y);
         }
         return node;
     }
+    
 public:
     BST() {
         root = nullptr;
     }
-    void insert(int val) {
-        root = insert(root, val);
+    void insert(int elm) {
+        root = insert(root, elm);
     }
-    void printStatus() {
+    void StatusPrinter() {
         cout << "Status: ";
-        inorderWithHeight(root);
+        inorder(root);
         cout << endl;
     }
-    void printPath(int x, int y) {
+    void Print(int x, int y) {
         vector<int> pathX, pathY;
-        findPath(root, x, pathX);
-        findPath(root, y, pathY);
-        Node* lca = findLCA(root, x, y);
-        vector<int> completePath;
-        vector<int> xToLCA;
-        findPath(root, x, xToLCA);
-        int lcaIndex = -1;
-        for (int i = 0; i < xToLCA.size(); i++) {
-            if (xToLCA[i] == lca->data) {
-                lcaIndex = i;
+        PathFinder(root, x, pathX);
+        PathFinder(root, y, pathY);
+        Node* lca = LCA_finder(root, x, y);
+        vector<int> ComPath;
+        vector<int> XtoLCA;
+        PathFinder(root, x, XtoLCA);
+        int LCA_idx = -1;
+        for (int i = 0; i < XtoLCA.size(); i++) {
+            if (XtoLCA[i] == lca->data) {
+                LCA_idx = i;
                 break;
             }
         }
-        for (int i = xToLCA.size() - 1; i >= lcaIndex; i--) {
-            completePath.push_back(xToLCA[i]);
+        for (int i = XtoLCA.size() - 1; i >= LCA_idx; i--) {
+            ComPath.push_back(XtoLCA[i]);
         }
-        vector<int> lcaToY;
-        findPath(root, y, lcaToY);
-        for (int i = 0; i < lcaToY.size(); i++) {
-            if (lcaToY[i] == lca->data) {
-                for (int j = i + 1; j < lcaToY.size(); j++) {
-                    completePath.push_back(lcaToY[j]);
+        vector<int> LCAtoY;
+        PathFinder(root, y, LCAtoY);
+        for (int i = 0; i < LCAtoY.size(); i++) {
+            if (LCAtoY[i] == lca->data) {
+                for (int j = i + 1; j < LCAtoY.size(); j++) {
+                    ComPath.push_back(LCAtoY[j]);
                 }
                 break;
             }
         }
-        for (int i = 0; i < completePath.size(); i++) {
+        for (int i = 0; i < ComPath.size(); i++) {
             if (i > 0) cout << " ";
-            cout << completePath[i];
+            cout << ComPath[i];
         }
         cout << endl;
-        cout << completePath.size() << endl;
+        cout << ComPath.size() << endl;
     }
 };
+
 int main() {
     BST bst;
-    int val;
-    while (cin >> val && val != -1) {
-        bst.insert(val);
+    int elm;
+    while (true) {
+        cin >> elm;
+        if (elm == -1) break;
+        bst.insert(elm);
     }
-    bst.printStatus();
+    bst.StatusPrinter();
     int x, y;
-    while (cin >> x >> y) {
-        bst.printPath(x, y);
+    while (true) {
+        cin >> x >> y;
+        bst.Print(x, y);
     }
     return 0;
 }
