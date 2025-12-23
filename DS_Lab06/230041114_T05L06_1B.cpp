@@ -28,15 +28,15 @@ private:
         }
         return node;
     }
-    void findKthSmallest(Node* node, int k, int& cnt, int& res) {
+    void SearchKthSmallest(Node* node, int k, int& cnt, int& res) {
         if (node == nullptr || cnt >= k) return;
-        findKthSmallest(node->left, k, cnt, res);
+        SearchKthSmallest(node->left, k, cnt, res);
         cnt++;
         if (cnt == k) {
             res = node->data;
             return;
         }
-        findKthSmallest(node->right, k, cnt, res);
+        SearchKthSmallest(node->right, k, cnt, res);
     }
 public:
     BST() {
@@ -50,7 +50,7 @@ public:
     int getKthSmallest(int k) {
         if (k > nodes || k <= 0) return -1;
         int cnt = 0, res = -1;
-        findKthSmallest(root, k, cnt, res);
+        SearchKthSmallest(root, k, cnt, res);
         return res;
     }
     int getSize() {
