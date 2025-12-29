@@ -4,66 +4,103 @@ struct Node {
     int data;
     Node* left;
     Node* right;
+    Node* par;
+    int height;
 };
-Node* CreateNode(int elm) {
-    Node* temp = new Node;
-    temp->data = elm;
-    temp->left = nullptr;
-    temp->right = nullptr;
-    return temp;
+Node* root = nullptr;
+
+Node* CreateNode(int x) {
+    Node* newNode = new Node();
+    newNode->data = x;
+    newNode->left = newNode->right = newNode->par = nullptr;
+    newNode->height = 0;
+    return newNode;
 }
-class BST {
-private:
-    Node* root;
-    Node* insert(Node* node, int elm) {
-        if (node == nullptr) {
-            return CreateNode(elm);
-        }
-        
-        if (elm < node->data) {
-            node->left = insert(node->left, elm);
-        } else if (elm > node->data) {
-            node->right = insert(node->right, elm);
-        }
-        return node;
-    }
-    int LCA_finder(Node* node, int u, int v) {
-        if (node == nullptr) return -1;
 
-        if (u < node->data && v < node->data)
-            return LCA_finder(node->left, u, v);
+void updateHeight(Node* n) {
+    if (n == nullptr) return;
+    int leftHeight = (n->left == nullptr) ? -1 : n->left->height;
+    int rightHeight = (n->right == nullptr) ? -1 : n->right->height;
+    n->height = max(leftHeight, rightHeight) + 1;
+}
 
-        if (u > node->data && v > node->data)
-            return LCA_finder(node->right, u, v);
-        return node->data;  
+void insert(int x) {
+    Node* newNode = CreateNode(x);
+    if (root == nullptr) {
+        root = newNode;
+        return;
     }
-public:
-    BST() {
-        root = nullptr;
+    Node* temp = root;
+    Node* parent = nullptr;
+    while (temp != nullptr) {
+        parent = temp;
+        if (x < temp->data)
+            temp = temp->left;
+        else
+            temp = temp->right;
     }
-    void insert(int elm) {
-        root = insert(root, elm);
+    newNode->par = parent;
+    if (x < parent->data)
+        parent->left = newNode;
+    else
+        parent->right = newNode;
+
+    Node* curr = parent;
+    while (curr != nullptr) {
+        updateHeight(curr);
+        curr = curr->par;
     }
-    int LCA(int u, int v) {
-        return LCA_finder(root, u, v);
+}
+
+Node* searchNode(int key) {
+    Node* temp = root;
+    while (temp != nullptr) {
+        if (key == temp->data)
+            return temp;
+        else if (key < temp->data)
+            temp = temp->left;
+        else
+            temp = temp->right;
     }
-};
+    return nullptr;
+}
+
+Node* LCA_finder(Node* root, int u, int v) {
+    Node* temp = root;
+    while (temp != nullptr) {
+        if (u < temp->data && v < temp->data)
+            temp = temp->left;
+        else if (u > temp->data && v > temp->data)
+            temp = temp->right;
+        else
+            return temp; 
+    }
+    return nullptr;
+}
+
+void findLCA(int u, int v) {
+    Node* lca = LCA_finder(root, u, v);
+    if (lca != nullptr)
+        cout << lca->data << endl;
+}
 
 int main() {
-    int n;
-    cin >> n;
-    BST tree;
-    for (int i = 0; i < n; i++) {
-        int elm;
-        cin >> elm;
-        tree.insert(elm);
+    int N;
+    cin >> N;
+
+    for (int i = 0; i < N; i++) {
+        int x;
+        cin >> x;
+        insert(x);
     }
+
     int q;
     cin >> q;
-    for (int i = 0; i < q; i++) {
+
+    while (q--) {
         int u, v;
         cin >> u >> v;
-        cout << tree.LCA(u, v) << endl;
+        findLCA(u, v);
     }
     return 0;
 }
