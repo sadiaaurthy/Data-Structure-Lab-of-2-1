@@ -52,19 +52,6 @@ void insert(int x) {
     }
 }
 
-Node* searchNode(int key) {
-    Node* temp = root;
-    while (temp != nullptr) {
-        if (key == temp->data)
-            return temp;
-        else if (key < temp->data)
-            temp = temp->left;
-        else
-            temp = temp->right;
-    }
-    return nullptr;
-}
-
 Node* LCA_finder(Node* root, int u, int v) {
     Node* temp = root;
     while (temp != nullptr) {
@@ -104,3 +91,4 @@ int main() {
     }
     return 0;
 }
+
