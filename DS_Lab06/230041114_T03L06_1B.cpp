@@ -31,21 +31,21 @@ void insert(int x) {
         return;
     }
     Node* temp = root;
-    Node* parent = nullptr;
+    Node* tar = nullptr;
     while (temp != nullptr) {
-        parent = temp;
+        tar = temp;
         if (x < temp->data)
             temp = temp->left;
         else
             temp = temp->right;
     }
-    newNode->par = parent;
-    if (x < parent->data)
-        parent->left = newNode;
+    newNode->par = tar;
+    if (x < tar->data)
+        tar->left = newNode;
     else
-        parent->right = newNode;
+        tar->right = newNode;
 
-    Node* curr = parent;
+    Node* curr = newNode->par;
     while (curr != nullptr) {
         updateHeight(curr);
         curr = curr->par;
