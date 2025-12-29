@@ -1,81 +1,84 @@
 #include <iostream>
+#include <vector>
 using namespace std;
-
 struct Node {
     int data;
-    Node* left;
-    Node* right;
+    Node *left;
+    Node *right;
+    Node *par;
+    int height = 0;
 };
-Node* CreateNode(int elm) {
-    Node* temp = new Node;
-    temp->data = elm;
-    temp->left = nullptr;
-    temp->right = nullptr;
-    return temp;
+Node *root = NULL;
+Node *CreateNode(int x) {
+    Node *newNode = new Node();
+    newNode->data = x;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    newNode->height = 0;
+    return newNode;
 }
-class BST {
-private:
-    Node* root;
-    int nodes;
-    Node* insert(Node* node, int elm) {
-        if (node == nullptr) {
-            return CreateNode(elm);
+void UpdateHeight(Node *node) {
+    if (node == NULL) return;
+    int lh = (node->left != NULL) ? node->left->height : -1;
+    int rh = (node->right != NULL) ? node->right->height : -1;
+    node->height = max(lh, rh) + 1;
+}
+void insert(int x) {
+    Node *newNode = CreateNode(x);
+    if (root == NULL) {
+        root = newNode;
+        return;
+    } else {
+        Node *temp = root;
+        Node *tar = NULL;
+        while (temp != NULL) {
+            tar = temp;
+            if (x < temp->data) temp = temp->left;
+            else temp = temp->right;
         }
-        if (elm < node->data) {
-            node->left = insert(node->left, elm);
-        } else if (elm > node->data) {
-            node->right = insert(node->right, elm);
+        newNode->par = tar;
+        if (x < tar->data) tar->left = newNode;
+        else tar->right = newNode;
+        Node *curr = newNode->par;
+        while (curr != NULL) {
+            UpdateHeight(curr);
+            curr = curr->par;
         }
-        return node;
     }
-    void SearchKthSmallest(Node* node, int k, int& cnt, int& res) {
-        if (node == nullptr || cnt >= k) return;
-        SearchKthSmallest(node->left, k, cnt, res);
-        cnt++;
-        if (cnt == k) {
-            res = node->data;
-            return;
-        }
-        SearchKthSmallest(node->right, k, cnt, res);
+}
+void inorderForKth(Node* root, vector<int>& V) {
+    if (root == nullptr) return;
+    inorderForKth(root->left, V);
+    V.push_back(root->data);
+    inorderForKth(root->right, V);
+}
+int findKthSmallest(int k, int totalNodes) {
+    if (k > totalNodes || k <= 0) {
+        return -1; 
     }
-public:
-    BST() {
-        root = nullptr;
-        nodes = 0;
-    }
-    void insert(int elm) {
-        root = insert(root, elm);
-        nodes++;
-    }
-    int getKthSmallest(int k) {
-        if (k > nodes || k <= 0) return -1;
-        int cnt = 0, res = -1;
-        SearchKthSmallest(root, k, cnt, res);
-        return res;
-    }
-    int getSize() {
-        return nodes;
-    }
-};
-
+    vector<int> V;
+    inorderForKth(root, V);
+    return V[k - 1];
+}
 int main() {
     int n;
     cin >> n;
-    BST bst;
     for (int i = 0; i < n; i++) {
-        int elm;
-        cin >> elm;
-        bst.insert(elm);
+        int value;
+        cin >> value;
+        insert(value);
     }
     int q;
     cin >> q;
     for (int i = 0; i < q; i++) {
         int k;
         cin >> k;
-        if (k > bst.getSize() || k <= 0)
+        if (k > n || k <= 0) {
             cout << "Invalid" << endl;
-        else
-            cout << bst.getKthSmallest(k) << endl;
+        } else {
+            int result = findKthSmallest(k, n);
+            cout << result << endl;
+        }
     }
     return 0;
 }
