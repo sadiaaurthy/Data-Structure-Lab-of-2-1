@@ -1,146 +1,129 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 using namespace std;
 struct Node {
     int data;
-    int height;
     Node* left;
     Node* right;
+    Node* par;
+    int height;
 };
-Node* createNode(int elm) {
+Node* root = nullptr;
+
+Node* CreateNode(int x) {
     Node* newNode = new Node();
-    newNode->data = elm;
+    newNode->data = x;
+    newNode->left = newNode->right = newNode->par = nullptr;
     newNode->height = 0;
-    newNode->left = nullptr;
-    newNode->right = nullptr;
     return newNode;
 }
-class BST {
-private:
-    Node* root;
-    int getHeight(Node* node) {
-        if (node == nullptr) return -1 ;
-        else return node->height;
-    }
-    void updateHeight(Node* node) {
-        if (node != nullptr) {
-            node->height = max(getHeight(node->left), getHeight(node->right)) + 1;
-        }
-    }
-    Node* insert(Node* node, int elm) {
-        if (node == nullptr) {
-            return createNode(elm);
-        }
-        if (elm < node->data) {
-            node->left = insert(node->left, elm);
-        } else if (elm > node->data) {
-            node->right = insert(node->right, elm);
-        }
-        updateHeight(node);
-        return node;
-    }
-    void inorder(Node* node) {
-        if (node == nullptr) return; 
-        inorder(node->left);
-        cout << node->data << "(" << node->height << ") ";
-        inorder(node->right);
-    }
-    bool PathFinder(Node* node, int tar, vector<int>& v) {
-        if (node == nullptr) {
-            return false;
-        }
-        v.push_back(node->data);
-        if (node->data == tar) {
-            return true;
-        }
-        if (tar < node->data) {
-            if (PathFinder(node->left, tar, v)) {
-                return true;
-            }
-        } else {
-            if (PathFinder(node->right, tar, v)) {
-                return true;
-            }
-        }
-        v.pop_back();
-        return false;
-    }
-    Node* LCA_finder(Node* node, int x, int y) {
-        if (node == nullptr) {
-            return nullptr;
-        }
-        if (x < node->data && y < node->data) {
-            return LCA_finder(node->left, x, y);
-        }
-        if (x > node->data && y > node->data) {
-            return LCA_finder(node->right, x, y);
-        }
-        return node;
-    }
-    
-public:
-    BST() {
-        root = nullptr;
-    }
-    void insert(int elm) {
-        root = insert(root, elm);
-    }
-    void StatusPrinter() {
-        cout << "Status: ";
-        inorder(root);
-        cout << endl;
-    }
-    void Print(int x, int y) {
-        vector<int> pX, pY;
-        PathFinder(root, x, pX);
-        PathFinder(root, y, pY);
-        Node* lca = LCA_finder(root, x, y);
-        vector<int> ComPath;
-        vector<int> XtoLCA;
-        PathFinder(root, x, XtoLCA);
-        int LCA_idx = -1;
-        for (int i = 0; i < XtoLCA.size(); i++) {
-            if (XtoLCA[i] == lca->data) {
-                LCA_idx = i;
-                break;
-            }
-        }
-        for (int i = XtoLCA.size() - 1; i >= LCA_idx; i--) {
-            ComPath.push_back(XtoLCA[i]);
-        }
-        vector<int> LCAtoY;
-        PathFinder(root, y, LCAtoY);
-        for (int i = 0; i < LCAtoY.size(); i++) {
-            if (LCAtoY[i] == lca->data) {
-                for (int j = i + 1; j < LCAtoY.size(); j++) {
-                    ComPath.push_back(LCAtoY[j]);
-                }
-                break;
-            }
-        }
-        for (int i = 0; i < ComPath.size(); i++) {
-            if (i > 0) cout << " ";
-            cout << ComPath[i];
-        }
-        cout << endl;
-        cout << ComPath.size() << endl;
-    }
-};
 
-int main() {
-    BST bst;
-    int elm;
-    while (true) {
-        cin >> elm;
-        if (elm == -1) break;
-        bst.insert(elm);
+void updateHeight(Node* node) {
+    int lh, rh;
+    if (node == nullptr) return;
+    if (node->left == nullptr) lh = -1 ;
+    else lh = node->left->height;
+    if (node->right == nullptr) rh = -1; 
+    else rh = node->right->height;
+    node->height = max(lh, rh) + 1;
+}
+
+void insert(int x) {
+    Node* newNode = CreateNode(x);
+    if (root == nullptr) {
+        root = newNode;
+        return;
     }
-    bst.StatusPrinter();
-    int x, y;
+    Node* temp = root;
+    Node* tar = nullptr;
+    while (temp != nullptr) {
+        tar = temp;
+        if (newNode->data < temp->data)
+            temp = temp->left;
+        else
+            temp = temp->right;
+    }
+    newNode->par = tar;
+    if (newNode->data < tar->data)
+        tar->left = newNode;
+    else
+        tar->right = newNode;
+
+    Node* curr = newNode->par;
+    while (curr != nullptr) {
+        updateHeight(curr);
+        curr = curr->par;
+    }
+}
+void inorder(Node *node) {
+    if (node == NULL) return;
+    inorder(node->left);
+    cout << node->data << "(" << node->height << ") ";
+    inorder(node->right);
+}
+// Node *SearchNode(int key) {
+//     Node *temp = root;
+//     while (temp != NULL) {
+//         if (key == temp->data) return temp;
+//         else if (key < temp->data) temp = temp->left;
+//         else  temp = temp->right;
+//     }
+//     return NULL;
+// }
+Node *LCA_finder(Node* root, int u, int v) {
+    Node* temp = root;
+    while (temp != nullptr) {
+        if (u < temp->data && v < temp->data)
+            temp = temp->left;
+        else if (u > temp->data && v > temp->data)
+            temp = temp->right;
+        else
+            return temp; 
+    }
+    return nullptr;
+}
+
+// void findLCA(int u, int v) {
+//     Node* lca = LCA_finder(root, u, v);
+//     if (lca != nullptr)
+//         cout << lca->data << endl;
+// }
+bool PathToNode(Node *root /*LCA root*/, int key, vector<int> &vec) {
+    Node *temp = root; // This root is LCA root
+    while (temp != NULL) {
+        vec.push_back(temp->data);
+        if (temp->data == key) return true;
+        else if (key < temp->data) temp = temp->left;
+        else temp = temp->right;
+    }
+    vec.clear();
+    return false;
+}
+void PrintPath(int l, int r) {
+    Node *lca = LCA_finder(root, l, r);
+    vector<int> pl, pr;
+    PathToNode(lca, l, pl);
+    PathToNode(lca, r, pr);
+    for (int i = pl.size() - 1; i >= 0; i--) cout << pl[i] << " ";
+    for (int i = 1; i < pr.size(); i++) cout << pr[i] << " ";
+    cout << endl;
+    cout << pl.size() + pr.size() - 1 << endl;
+}
+int main() {
+    int x;
     while (true) {
-        cin >> x >> y;
-        bst.Print(x, y);
+        cin >> x;
+        if (x == -1) break;
+        insert(x);
+    }
+    cout << "Status: ";
+    inorder(root);
+    cout << endl;
+
+    int u, v;
+    while (true) {
+        cin >> u >> v;
+        PrintPath(u, v);
     }
     return 0;
 }
