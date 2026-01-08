@@ -1,71 +1,86 @@
 #include <iostream>
-#include <vector>
 using namespace std;
 struct Node {
     int data;
     Node* left;
     Node* right;
+    Node* par;
+    int height;
 };
-Node* CreateNode(int elm) {
-    Node* temp = new Node;
-    temp->data = elm;
-    temp->left = nullptr;
-    temp->right = nullptr;
-    return temp;
+Node* root = nullptr;
+Node* CreateNode(int x) {
+    Node* newNode = new Node ();
+    newNode->data = x;
+    newNode->left = newNode->right = newNode->par = nullptr;
+    newNode->height = 0;
+    return newNode;
 }
-class BST {
-private:
-    Node* root;
-    Node* insert(Node* node, int elm) {
-        if (node == nullptr) {
-            return CreateNode(elm);
-        } 
-        if (elm < node->data) {
-            node->left = insert(node->left, elm);
-        } else if (elm > node->data) {
-            node->right = insert(node->right, elm);
+void updateHeight(Node* n) {
+    if (n == nullptr) return;
+    int leftHeight = (n->left == nullptr) ? -1 : n->left->height;
+    int rightHeight = (n->right == nullptr) ? -1 : n->right->height;
+    n->height = max(leftHeight, rightHeight) + 1;
+}
+void insert(int x) {
+    Node* newNode = CreateNode(x);
+    if (root == nullptr) {
+        root = newNode;
+    } else {
+        Node* temp = root;
+        Node* tar = nullptr;
+        while (temp != nullptr) {
+            tar = temp;
+            if (x < temp->data) {
+                temp = temp->left;
+            } else {
+                temp = temp->right;
+            }
         }
-        return node;
-    }
-    void LeafNodesFinder(Node* node, vector<int>& leaves) {
-        if (node == nullptr) return;
-        LeafNodesFinder(node->left, leaves);
-        if (node->left == nullptr && node->right == nullptr) {
-            leaves.push_back(node->data);
+        newNode->par = tar;
+        if (x < tar->data) {
+            tar->left = newNode;
+        } else {
+            tar->right = newNode;
         }
-        LeafNodesFinder(node->right, leaves);
+        while (newNode->par != nullptr) {
+            newNode = newNode->par;
+            updateHeight(newNode);
+        }
     }
-public:
-    BST() {
-        root = nullptr;
-    }
-    void insert(int elm) {
-        root = insert(root, elm);
-    }
-    vector<int> getLeafNodes() {
-        vector<int> leaves;
-        LeafNodesFinder(root, leaves);
-        return leaves;
-    }
-};
+}
+void printLeavesInorder(Node* n, bool &first) {
+    if (n == nullptr) return;
 
+    printLeavesInorder(n->left, first);
 
+    if (n->left == nullptr && n->right == nullptr) {
+        if (!first) cout << ", ";
+        cout << n->data;
+        first = false;
+    }
+
+    printLeavesInorder(n->right, first);
+}
+void print_leaf_nodes() {
+    cout << "Leaf nodes:\n";
+    bool first = true;
+    printLeavesInorder(root, first);
+    cout << "\n";
+}
 int main() {
-    int n;
-    cin >> n;
-    BST bst;
-    for (int i = 0; i < n; i++) {
-        int elm;
-        cin >> elm;
-        bst.insert(elm);
-    }
-    vector<int> leafNodes = bst.getLeafNodes();
-    cout << "Leaf nodes:" << endl;
-    for (int i = 0; i < leafNodes.size(); i++) {
-        if (i != 0) cout << ", ";
-        cout << leafNodes[i];
-    }
-    cout << endl;
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
+    int N;
+    cin >> N;
+
+    root = nullptr;              
+    for (int i = 0; i < N; i++) {
+        int x;
+        cin >> x;
+        insert(x);
+    }
+
+    print_leaf_nodes();
     return 0;
 }
