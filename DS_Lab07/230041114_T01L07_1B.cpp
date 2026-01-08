@@ -50,7 +50,7 @@ void insert(int x) {
     while (temp != nullptr) {
         tar = temp;
         if (x < temp->data) temp = temp->left;
-        else temp = temp->right; // duplicates go right
+        else temp = temp->right; 
     }
 
     newNode->par = tar;
@@ -69,7 +69,6 @@ void inorderBF(Node* n) {
 
     inorderBF(n->left);
 
-    // first = false;
     cout << n->data << "(" << balance_factor(n) << ") " ;
 
     inorderBF(n->right);
@@ -91,3 +90,4 @@ int main() {
     }
     return 0;
 }
+
