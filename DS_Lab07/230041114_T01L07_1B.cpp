@@ -1,74 +1,93 @@
 #include <iostream>
 #include <algorithm>
 using namespace std;
+
 struct Node {
     int data;
-    Node* left, *right, *parent;
+    Node* left;
+    Node* right;
+    Node* par;
     int height;
-    Node (int val) {
-        data = val;
-        left = right = parent = nullptr;
-        height = 0;
-    }
-};
-class BST {
-    private: 
-    Node* root;
-    int height(Node* node) {
-        if (node == nullptr) return -1;
-        return node->height;
-    }
-    int balance_factor(Node* node) {
-        return height(node->left) - height(node->right);
-    }
-    void update_height(Node* node) {
-        while (node != nullptr) {
-            node->height = 1 + max(height(node->left), height(node->right));
-            node = node->parent;
-        }
-    }
-    void inorder(Node* node) {
-        if (!node) return;
-        inorder(node->left);
-        cout << node->data << "(" << balance_factor(node) << ")";
-        inorder(node->right);
-    }
-    public: 
-        BST() {
-            root = nullptr;
-        }
-        void insertion(int key) {
-            if (root == nullptr) {
-                root = new Node(key);
-                return;
-            }
-            Node* curr = root;
-            Node* parent = nullptr;
-            while (curr != nullptr) {
-                parent = curr;
-                if (key < curr->data) curr = curr->left;
-                else curr = curr->right;
-            }
-            Node* newNode = new Node(key);
-            newNode->parent = parent;
-            if (key < parent->data) parent->left = newNode;
-            else parent->right = newNode;
-            update_height(parent);
-        }
-        void Print() {
-            inorder(root);
-            cout << endl;
-        }
 };
 
+Node* root = nullptr;
+
+Node* CreateNode(int x) {
+    Node* newNode = new Node();
+    newNode->data = x;
+    newNode->left = newNode->right = newNode->par = nullptr;
+    newNode->height = 0;
+    return newNode;
+}
+
+int height(Node* n) {
+    return (n == nullptr) ? -1 : n->height;
+}
+
+void updateHeight(Node* n) {
+    if (n == nullptr) return;
+    int leftHeight = (n->left == nullptr) ? -1 : n->left->height;
+    int rightHeight = (n->right == nullptr) ? -1 : n->right->height;
+    n->height = max(leftHeight, rightHeight) + 1;
+}
+
+int balance_factor(Node* n) {
+    if (n == nullptr) return 0; 
+    return height(n->left) - height(n->right);
+}
+
+void insert(int x) {
+    Node* newNode = CreateNode(x);
+
+    if (root == nullptr) {
+        root = newNode;
+        return;
+    }
+
+    Node* temp = root;
+    Node* tar = nullptr;
+
+    while (temp != nullptr) {
+        tar = temp;
+        if (x < temp->data) temp = temp->left;
+        else temp = temp->right; // duplicates go right
+    }
+
+    newNode->par = tar;
+    if (x < tar->data) tar->left = newNode;
+    else tar->right = newNode;
+
+
+    while (newNode->par != nullptr) {
+        newNode = newNode->par;
+        updateHeight(newNode);
+    }
+}
+
+void inorderBF(Node* n) {
+    if (n == nullptr) return;
+
+    inorderBF(n->left);
+
+    // first = false;
+    cout << n->data << "(" << balance_factor(n) << ") " ;
+
+    inorderBF(n->right);
+}
+
+void print_tree() {
+    inorderBF(root);
+    cout << "\n";
+}
+
 int main() {
-    BST bst;
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
     int x;
-    while (true) {
-        cin >> x;
-        if (x == -1) break;
-        bst.insertion(x);
-        bst.Print();
+    while (cin >> x && x != -1) {
+        insert(x);
+        print_tree(); 
     }
     return 0;
 }
