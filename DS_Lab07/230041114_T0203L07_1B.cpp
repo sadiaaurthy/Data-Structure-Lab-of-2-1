@@ -10,12 +10,7 @@ struct Node {
 };
 Node *root = nullptr;
 int height(Node *n) {
-    if (n == nullptr) {
-        return 0;
-    }
-    else {
-        return n->height;
-    }
+    return  (n == nullptr) ? -1 : n->height;
 }
 void updateheight(Node *n) {
     while (n != nullptr) {
@@ -28,10 +23,7 @@ int balance_factor(Node *n) {
 }
 bool balance_check(Node *n) {
     int bf = balance_factor(n);
-    if (bf > 1 || bf < -1) {
-        return false;
-    }
-    return true;
+    return (bf > 1 || bf < -1) ? false : true;
 }
 void right_rotate(Node *z) {
     if (z == nullptr || z->left == nullptr)
@@ -134,7 +126,6 @@ void balance(Node *n, int x) {
 void balance_after_deletion(Node *n) {
     if (!balance_check(n)) {
         int bf = balance_factor(n);
-
         if (bf > 1) {
             if (balance_factor(n->left) >= 0) {
                 cout << "Imbalanced at node " << n->data << endl;
@@ -323,7 +314,6 @@ void deleteNode(int x) {
 
 int main() {
     string input;
-
     while (cin >> input) {
         if (input == "Delete") {
             int del;
@@ -342,6 +332,5 @@ int main() {
                 insert(a);
         }
     }
-
     return 0;
 }
