@@ -80,8 +80,6 @@ void print_tree() {
 }
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
 
     int x;
     while (cin >> x && x != -1) {
@@ -90,4 +88,5 @@ int main() {
     }
     return 0;
 }
+
 
