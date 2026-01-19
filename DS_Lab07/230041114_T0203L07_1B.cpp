@@ -224,7 +224,6 @@ Node *findMax(Node *n) {
 }
 
 void deleteNode(int x) {
-    // --------- Step 1: find the target node (BST search) ----------
     Node* fnd = searchNode(x);
     if (fnd == nullptr) {
         cout << "Node not found" << endl;
@@ -343,3 +342,4 @@ int main() {
     }
     return 0;
 }
+
