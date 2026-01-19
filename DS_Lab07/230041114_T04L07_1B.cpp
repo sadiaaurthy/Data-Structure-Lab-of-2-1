@@ -5,11 +5,11 @@ struct Node {
     int data;
     Node* left;
     Node* right;
-    Node* parent;
+    Node* par;
     int height;
     int subtree_size; 
     Node(int val) : data(val), left(nullptr), right(nullptr), 
-                    parent(nullptr), height(1), subtree_size(1) {}
+                    par(nullptr), height(1), subtree_size(1) {}
 };
 Node* root = nullptr;
 int height(Node* n) {
@@ -30,7 +30,7 @@ void updateHeight(Node* n) {
     while (n != nullptr) {
         n->height = 1 + max(height(n->left), height(n->right));
         n->subtree_size = 1 + getSize(n->left) + getSize(n->right);
-        n = n->parent;
+        n = n->par;
     }
 }
 int balance_factor(Node* n) {
@@ -48,22 +48,22 @@ void right_rotate(Node* z) {
     
     if (z == root) {
         root = y;
-        y->parent = nullptr;
+        y->par = nullptr;
     } else {
-        y->parent = z->parent;
-        if (z->parent != nullptr) {
-            if (z == z->parent->right) {
-                z->parent->right = y;
+        y->par = z->par;
+        if (z->par != nullptr) {
+            if (z == z->par->right) {
+                z->par->right = y;
             } else {
-                z->parent->left = y;
+                z->par->left = y;
             }
         }
     }
     
     y->right = z;
-    z->parent = y;
+    z->par = y;
     z->left = yr;
-    if (yr != nullptr) yr->parent = z;
+    if (yr != nullptr) yr->par = z;
     
     updateNode(z);
     updateNode(y);
@@ -71,28 +71,27 @@ void right_rotate(Node* z) {
 
 void left_rotate(Node* z) {
     if (z == nullptr || z->right == nullptr) return;
-    
     Node* y = z->right;
     Node* yL = y->left;
     
     if (z == root) {
         root = y;
-        y->parent = nullptr;
+        y->par = nullptr;
     } else {
-        y->parent = z->parent;
-        if (z->parent != nullptr) {
-            if (z == z->parent->left) {
-                z->parent->left = y;
+        y->par = z->par;
+        if (z->par != nullptr) {
+            if (z == z->par->left) {
+                z->par->left = y;
             } else {
-                z->parent->right = y;
+                z->par->right = y;
             }
         }
     }
     y->left = z;
-    z->parent = y;
+    z->par = y;
     z->right = yL;
     if (yL != nullptr) {
-        yL->parent = z;
+        yL->par = z;
     }
     updateNode(z);
     updateNode(y);
@@ -130,7 +129,7 @@ void insert(int x) {
         if (newNode->data < temp->data) temp = temp->left;
         else temp = temp->right;
     }
-    newNode->parent = tar;
+    newNode->par = tar;
     if (newNode->data < tar->data) tar->left = newNode;
     else tar->right = newNode;
     
@@ -142,7 +141,7 @@ void insert(int x) {
             balance(temp, x);
             break;
         }
-        temp = temp->parent;
+        temp = temp->par;
     }
 }
 int lowerCount(int x) {
@@ -158,11 +157,11 @@ int lowerCount(int x) {
     return cnt;
 }
 
-void display(Node* root) {
+void inorder(Node* root) {
     if (root == nullptr) return;
-    display(root->left);
+    inorder(root->left);
     cout << root->data << " ";
-    display(root->right);
+    inorder(root->right);
 }
 
 int main() {
