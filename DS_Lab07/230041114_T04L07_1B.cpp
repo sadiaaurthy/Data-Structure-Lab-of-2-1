@@ -13,12 +13,10 @@ struct Node {
 };
 Node* root = nullptr;
 int height(Node* n) {
-    if (n) return n->height ;
-    else return 0;
+   return (!n) ? 0 : n->height;
 }
 int getSize(Node* n) {
-    if (n) return n->subtree_size;
-    else return 0;
+    return (!n) ? 0 : n->subtree_size;
 }
 void updateNode(Node* n) {
     if (n) {
@@ -176,3 +174,4 @@ int main() {
     }
     return 0;
 }
+
