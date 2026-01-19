@@ -66,7 +66,6 @@ void right_rotate(Node *z) {
     updateheight(z);
     updateheight(y);
 }
-
 void left_rotate(Node *z) {
     if (z == nullptr || z->right == nullptr)
         return;
@@ -342,4 +341,5 @@ int main() {
     }
     return 0;
 }
+
 
