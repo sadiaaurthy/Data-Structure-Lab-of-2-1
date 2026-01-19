@@ -18,6 +18,19 @@ void updateheight(Node *n) {
         n = n->parent;
     }
 }
+Node* searchNode(int key) {
+    Node* temp = root;
+    while (temp != nullptr) {
+        if (key == temp->data) {
+            return temp;
+        } else if (key < temp->data) {
+            temp = temp->left;
+        } else {
+            temp = temp->right;
+        }
+    }
+    return temp;
+}
 int balance_factor(Node *n) {
     return height(n->left) - height(n->right);
 }
@@ -84,12 +97,12 @@ void left_rotate(Node *z) {
     updateheight(y);
 }
 
-void display(Node *root) {
+void inorder(Node *root) {
     if (root == nullptr)
         return;
-    display(root->left);
+    inorder(root->left);
     cout << root->data << "(" << balance_factor(root) << ") ";
-    display(root->right);
+    inorder(root->right);
 }
 
 void balance(Node *n, int x) {
@@ -177,7 +190,7 @@ void insert(int x) {
             tar->right = newNode;
         updateheight(newNode);
     }
-    display(root);
+    inorder(root);
     cout << endl;
     if (balance_check(root)) {
         cout << "Balanced" << endl;
@@ -196,103 +209,99 @@ void insert(int x) {
         }
         if (imbalanced) {
             cout << "Status:";
-            display(root);
+            inorder(root);
             cout << endl;
             cout << "Root=" << root->data << endl;
         }
     }
 }
 
-Node *findMin(Node *n) {
-    while (n->left != nullptr) {
-        n = n->left;
+Node *findMax(Node *n) {
+    while (n->right != nullptr) {
+        n = n->right;
     }
     return n;
 }
 
 void deleteNode(int x) {
-    Node *temp = root;
-    Node *tar = nullptr;
-
-    while (temp != nullptr && temp->data != x) {
-        if (x < temp->data) temp = temp->left;
-        else temp = temp->right;
-    }
-
-    if (temp == nullptr) {
+    // --------- Step 1: find the target node (BST search) ----------
+    Node* fnd = searchNode(x);
+    if (fnd == nullptr) {
         cout << "Node not found" << endl;
         return;
     }
-    tar = temp;
-    Node *checkNode = tar->parent;
 
-    if (tar->left == nullptr && tar->right == nullptr) {
-        if (tar == root) {
-            root = nullptr;
+    Node* checkNode = fnd->parent;
+
+    // --------- Case A: tar is a LEAF (no children) ----------
+    if (fnd->left == nullptr && fnd->right == nullptr) {
+        if (fnd == root) {
+            root = nullptr;            
+        } else {
+            if (fnd->parent->left == fnd) fnd->parent->left = nullptr;
+            else fnd->parent->right = nullptr;
         }
-        else {
-            if (tar->parent->left == tar) tar->parent->left = nullptr;
-            else tar->parent->right = nullptr;
-        }
-        delete tar;
+        delete fnd;
     }
-    else if (tar->left == nullptr) {
-        if (tar == root) {
-            root = tar->right;
+
+    // --------- Case B1: tar has ONLY RIGHT CHILD ----------
+    else if (fnd->left == nullptr && fnd->right != nullptr) {
+        Node* child = fnd->right;
+
+        if (fnd == root) {
+            root = child;
             root->parent = nullptr;
+            checkNode = root;            
+        } else {
+            if (fnd->parent->left == fnd) fnd->parent->left = child;
+            else fnd->parent->right = child;
+
+            child->parent = fnd->parent;  
         }
-        else {
-            if (tar->parent->left == tar)
-            {
-                tar->parent->left = tar->right;
-            }
-            else
-            {
-                tar->parent->right = tar->right;
-            }
-            tar->right->parent = tar->parent;
-        }
-        delete tar;
+        delete fnd;
     }
-    else if (tar->right == nullptr) {
-        if (tar == root)
-        {
-            root = tar->left;
+
+    // --------- Case B2: tar has ONLY LEFT CHILD ----------
+    else if (fnd->right == nullptr && fnd->left != nullptr) {
+        Node* child = fnd->left;
+
+        if (fnd == root) {
+            root = child;
             root->parent = nullptr;
+            checkNode = root;          
+        } else {
+            if (fnd->parent->left == fnd) fnd->parent->left = child;
+            else fnd->parent->right = child;
+
+            child->parent = fnd->parent; 
         }
-        else
-        {
-            if (tar->parent->left == tar)
-            {
-                tar->parent->left = tar->left;
-            }
-            else
-            {
-                tar->parent->right = tar->left;
-            }
-            tar->left->parent = tar->parent;
-        }
-        delete tar;
+        delete fnd;
     }
-    else {
-        Node *successor = findMin(tar->right);
-        int successorData = successor->data;
-        checkNode = successor->parent;
 
-        if (successor->parent->left == successor)
-            successor->parent->left = successor->right;
-        else
-            successor->parent->right = successor->right;
+    // --------- Case C: tar has TWO CHILDREN ----------
+else {
+    Node* pred = findMax(fnd->left);
+    int predData = pred->data;
+    checkNode = pred->parent;
+    Node* predChild = pred->left;
+    if (pred->parent->right == pred)
+        pred->parent->right = predChild;
+    else
+        pred->parent->left = predChild;
 
-        if (successor->right != nullptr)
-            successor->right->parent = successor->parent;
+    if (predChild != nullptr)
+        predChild->parent = pred->parent;
 
-        delete successor;
-        tar->data = successorData;
-    }
+    delete pred;
+    fnd->data = predData;
+}
+
+
+    // --------- Rebalancing ----------
     if (checkNode != nullptr) {
         updateheight(checkNode);
-        Node *temp = checkNode;
+
+        Node* temp = checkNode;
         while (temp != nullptr) {
             if (!balance_check(temp)) {
                 balance_after_deletion(temp);
@@ -302,15 +311,15 @@ void deleteNode(int x) {
         }
     }
 
-    display(root);
+    inorder(root);
     cout << endl;
 
-    if (balance_check(root)) {
+    if (root != nullptr && balance_check(root)) {
         cout << "Balanced" << endl;
+        cout << "Root=" << root->data << endl;
     }
-
-    cout << "Root=" << root->data << endl;
 }
+
 
 int main() {
     string input;
@@ -324,7 +333,7 @@ int main() {
             int a = stoi(input);
             if (a == -1) {
                 cout << "Status: ";
-                display(root);
+                inorder(root);
                 cout << endl;
                 break;
             }
