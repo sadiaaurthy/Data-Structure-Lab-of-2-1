@@ -68,9 +68,6 @@ void print_leaf_nodes() {
     cout << "\n";
 }
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
     int N;
     cin >> N;
 
@@ -84,3 +81,4 @@ int main() {
     print_leaf_nodes();
     return 0;
 }
+
