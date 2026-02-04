@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-
 using namespace std;
 
 string getUniqueCharacterSet(const string& word) {
@@ -55,3 +54,4 @@ int main() {
 
     return 0;
 }
+
