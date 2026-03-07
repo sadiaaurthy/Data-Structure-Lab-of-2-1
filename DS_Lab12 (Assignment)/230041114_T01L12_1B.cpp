@@ -37,7 +37,6 @@ int main() {
             magicBall++;
         }
     }
-
-    cout << magicBall << endl;
     
+    cout << magicBall << endl;
 }
