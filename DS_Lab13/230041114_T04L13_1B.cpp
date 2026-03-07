@@ -114,10 +114,9 @@ public:
     void printTree() {
         int last = 2 * n - 1;
         for (int i = 1; i <= last; i++) {
-            if (i > 1) cout << ' ';
-            cout << tree[i];
+            cout << tree[i] << " ";
         }
-        cout << '\n';
+        cout << endl;
     }
 
     void printLazy() {
@@ -164,4 +163,5 @@ int main() {
             cout << endl;
         }
     }
+
 }
