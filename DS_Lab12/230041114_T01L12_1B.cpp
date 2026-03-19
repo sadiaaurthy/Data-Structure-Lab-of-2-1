@@ -7,8 +7,7 @@ int main() {
     cin >> str;
     int Q;
     cin >> Q;
-    vector<vector<int>> preFreq;
-    preFreq.assign(str.size() + 1, vector<int> (26, 0));
+    vector<vector<int>>preFreq(str.size() + 1, vector<int>(26));
     for (int i = 0; i < str.size(); i++) {
         preFreq[i + 1] = preFreq[i];
         preFreq[i + 1][str[i] - 'a'] ++;
@@ -17,7 +16,7 @@ int main() {
         int l, r;
         cin >> l >> r;
         l--, r--;
-        vector<int>  f(26, 0);
+        vector<int>f(26);
         for (int i = 0; i < 26; i++) {
             f[i] = preFreq[r + 1][i] - preFreq[l][i];
         }
