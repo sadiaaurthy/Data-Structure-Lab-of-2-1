@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <climits>
 using namespace std;
 
 void SegmentTree(int node, int start, int end, vector<int>& vec, vector<int>& tree) {
@@ -24,7 +25,7 @@ void SegmentTree(int node, int start, int end, vector<int>& vec, vector<int>& tr
 
 int MinQuery(int node, int start, int end, int l, int r, vector<int>& tree) {
     if (r < start || end < l) {
-        return -1;
+        return INT_MAX;
     }
     if (l <= start && end <= r) {
         return tree[node];
